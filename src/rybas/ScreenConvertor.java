@@ -55,6 +55,18 @@ public class ScreenConvertor {
         return screenH;
     }
 
+    public ScreenPoint r2s(RealPoint rp) {
+        int px = (int) ((rp.getX() - x) * screenW / w);
+        int py = (int) ((y - rp.getY()) * screenH / h);
+        return new ScreenPoint(px, py);
+    }
+
+    public RealPoint s2r(ScreenPoint p) {
+        double px = p.getX() * w / screenW + x;
+        double py = y - p.getY() * h / screenH;
+        return new RealPoint(px, py);
+    }
+
     public ScreenConvertor(double x, double y, double w, double h, int screenW, int screenH) {
         this.x = x;
         this.y = y;
