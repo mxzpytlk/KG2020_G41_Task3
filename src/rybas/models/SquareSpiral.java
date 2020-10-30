@@ -1,47 +1,59 @@
 package rybas.models;
 
+import rybas.ScreenConvertor;
 import rybas.linedrawers.LineDrawer;
+import rybas.points.RealPoint;
 import rybas.points.ScreenPoint;
 import java.util.ArrayList;
 
 public class SquareSpiral {
-    private ScreenPoint centre;
+    private RealPoint centre;
     private int turnAmount = 10;
     private double size = 1;
     private boolean clockwiseMovement = true;
-    private ArrayList<ScreenPoint> points = new ArrayList<>();
+    private ArrayList<RealPoint> points;
 
-    public SquareSpiral(ScreenPoint centre) {
+    public SquareSpiral(RealPoint centre) {
         this.centre = centre;
         points = findPoints();
     }
 
-    public SquareSpiral(ScreenPoint centre, int turnAmount) {
+    public SquareSpiral(RealPoint centre, int turnAmount) throws SpiralParametersException {
         this.centre = centre;
+        if (turnAmount <= 0) {
+            throw new SpiralParametersException("Amounts of lines can't be less than 0");
+        }
         this.turnAmount = turnAmount;
-        this.size = 1;
         points = findPoints();
     }
 
-    public SquareSpiral(ScreenPoint centre, double size) {
+    public SquareSpiral(RealPoint centre, double size) throws SpiralParametersException {
         this.centre = centre;
-        this.turnAmount = 10;
+        if (size <= 0) {
+            throw new SpiralParametersException("Size can't be less than 0");
+        }
         this.size = size;
         points = findPoints();
     }
 
-    public SquareSpiral(ScreenPoint centre, int turnAmount, double size) {
+    public SquareSpiral(RealPoint centre, int turnAmount, double size) throws SpiralParametersException {
         this.centre = centre;
+        if (turnAmount <= 0) {
+            throw new SpiralParametersException("Amounts of lines can't be less than 0");
+        }
         this.turnAmount = turnAmount;
+        if (size <= 0) {
+            throw new SpiralParametersException("Size can't be less than 0");
+        }
         this.size = size;
         points = findPoints();
     }
 
-    public ScreenPoint getCentre() {
+    public RealPoint getCentre() {
         return centre;
     }
 
-    public void setCentre(ScreenPoint centre) {
+    public void setCentre(RealPoint centre) {
         this.centre = centre;
         points = findPoints();
     }
@@ -54,12 +66,18 @@ public class SquareSpiral {
         return size;
     }
 
-    public void setTurnAmount(int turnAmount) {
+    public void setTurnAmount(int turnAmount) throws SpiralParametersException {
+        if (turnAmount <= 0) {
+            throw new SpiralParametersException("Amounts of lines can't be less than 0");
+        }
         this.turnAmount = turnAmount;
         points = findPoints();
     }
 
-    public void setSize(double size) {
+    public void setSize(double size) throws SpiralParametersException {
+        if (size <= 0) {
+            throw new SpiralParametersException("Size can't be less than 0");
+        }
         this.size = size;
         points = findPoints();
     }
@@ -72,11 +90,11 @@ public class SquareSpiral {
     * Метод ищет точки, которые находятся в месте,
     * где соединяются линии квадратной спирали и возвращает список этих точек.
     **/
-    private ArrayList<ScreenPoint> findPoints() {
-        ArrayList<ScreenPoint> points = new ArrayList<>();
+    private ArrayList<RealPoint> findPoints() {
+        ArrayList<RealPoint> points = new ArrayList<>();
 
-        int lineLength = (int) (20 * size);
-        ScreenPoint prevPoint = centre;
+        double lineLength = (0.1 * size);
+        RealPoint prevPoint = centre;
         Direction[] directions = Direction.values();
         int directionsTurnOrder = 0;
 
@@ -87,45 +105,47 @@ public class SquareSpiral {
             directionsTurnOrder = clockwiseMovement ? (directionsTurnOrder + 1) % directions.length :
                     (directionsTurnOrder + directions.length - 1) % directions.length;
             if (i % 2 == 1) {
-                lineLength += 20 * size;
+                lineLength += 0.1 * size;
             }
         }
 
         return points;
     }
 
-    public void draw(LineDrawer ld) {
+    public void draw(LineDrawer ld, ScreenConvertor sc) {
         for (int i = 0; i < points.size() - 1; i++) {
-            ld.drawLine(points.get(i), points.get(i + 1));
+            ScreenPoint p1 = sc.r2s(points.get(i));
+            ScreenPoint p2 = sc.r2s(points.get(i + 1));
+            ld.drawLine(p1, p2);
         }
     }
 
     private enum Direction {
         DOWN {
             @Override
-            ScreenPoint findNextPoint(ScreenPoint start, int length) {
-                return new ScreenPoint(start.getX(), start.getY() - length);
+            RealPoint findNextPoint(RealPoint start, double length) {
+                return new RealPoint(start.getX(), start.getY() + length);
             }
         },
         RIGHT {
             @Override
-            ScreenPoint findNextPoint(ScreenPoint start, int length) {
-                return new ScreenPoint(start.getX() + length, start.getY());
+            RealPoint findNextPoint(RealPoint start, double length) {
+                return new RealPoint(start.getX() + length, start.getY());
             }
         },
         UP {
             @Override
-            ScreenPoint findNextPoint(ScreenPoint start, int length) {
-                return new ScreenPoint(start.getX(), start.getY() + length);
+            RealPoint findNextPoint(RealPoint start, double length) {
+                return new RealPoint(start.getX(), start.getY() - length);
             }
         },
         LEFT {
             @Override
-            ScreenPoint findNextPoint(ScreenPoint start, int length) {
-                return new ScreenPoint(start.getX() - length, start.getY());
+            RealPoint findNextPoint(RealPoint start, double length) {
+                return new RealPoint(start.getX() - length, start.getY());
             }
         };
 
-        abstract ScreenPoint findNextPoint(ScreenPoint start, int length);
+        abstract RealPoint findNextPoint(RealPoint start, double length);
     }
 }

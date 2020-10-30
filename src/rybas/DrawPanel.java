@@ -16,13 +16,10 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class DrawPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener {
-    private ArrayList<Line> lines = new ArrayList<>();
-    private ArrayList<SquareSpiral> spirals = new ArrayList<>();
-    private ScreenConvertor sc = new ScreenConvertor(
+    private final ArrayList<SquareSpiral> spirals = new ArrayList<>();
+    private final ScreenConvertor sc = new ScreenConvertor(
             -2, 2, 4, 4, 800, 600
     );
-/*    private Line xAxis = new Line(-1, 0, 1, 0);
-    private Line yAxis = new Line(0, -1, 0, 1);*/
 
     public DrawPanel() {
         this.addMouseMotionListener(this);
@@ -40,14 +37,11 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         sc.setScreenW(getWidth());
         bi_g.fillRect(0, 0, getWidth(), getHeight());
         bi_g.setColor(Color.black);
-//        drawAxes(ld);
-//        drawAll(ld);\
+
         for (SquareSpiral ss : spirals) {
-            ss.draw(ld);
+            ss.draw(ld, sc);
         }
-        if (currentLine != null) {
-            drawLine(ld, currentLine);
-        }
+
         bi_g.dispose();
         g.drawImage(bi, 0, 0, null);
     }
@@ -56,14 +50,7 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         ld.drawLine(sc.r2s(l.getP1()), sc.r2s(l.getP2()));
     }
 
- /*   private void drawAxes(LineDrawer ld) {
-        ld.drawLine(sc.realToScreen(xAxis.getP1()), sc.realToScreen(xAxis.getP2()));
-        ld.drawLine(sc.realToScreen(yAxis.getP1()), sc.realToScreen(yAxis.getP2()));
-        for (Line l : lines) {
-            ld.drawLine(sc.realToScreen(l.getP1()),
-                    sc.realToScreen(l.getP2()));
-        }
-    }*/
+
 
     @Override
     public void mouseMoved(MouseEvent e) {
@@ -73,21 +60,18 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        spirals.add(new SquareSpiral(new ScreenPoint(e.getX(), e.getY())));
+        spirals.add(new SquareSpiral(sc.s2r(new ScreenPoint(e.getX(), e.getY()))));
         repaint();
     }
 
     @Override
     public void mouseDragged(MouseEvent e) {
         ScreenPoint current = new ScreenPoint(e.getX(), e.getY());
-        moveScreen(e, current);
-        if (currentLine != null) {
-            currentLine.setP2(sc.s2r(current));
-        }
+        moveScreen(current);
         repaint();
     }
 
-    private void moveScreen(MouseEvent e, ScreenPoint current) {
+    private void moveScreen(ScreenPoint current) {
         ScreenPoint delta;
 
         if (prevDrag != null) {
@@ -108,29 +92,20 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         }
     }
 
-    private Line currentLine = null;
     @Override
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3) {
             prevDrag = new ScreenPoint(e.getX(), e.getY());
-        } else if (e.getButton() == MouseEvent.BUTTON1) {
-//            currentLine = new Line(
-//                    sc.s2r(new ScreenPoint(e.getX(), e.getY())),
-//                    sc.s2r(new ScreenPoint(e.getX(), e.getY()))
-//            );
+            repaint();
         }
-        repaint();
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3) {
             prevDrag = null;
-        } else if (e.getButton() == MouseEvent.BUTTON1) {
-            lines.add(currentLine);
-            currentLine = null;
+            repaint();
         }
-        repaint();
     }
 
     @Override
@@ -146,7 +121,7 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
     public void mouseWheelMoved(MouseWheelEvent e) {
         int clicks = e.getWheelRotation();
         double scale = 1;
-        double coef = clicks > 0 ?  0.9 : 1.1;
+        double coef = clicks > 0 ?  1.1 : 0.9;
         for (int i = 0; i < Math.abs(clicks); i++) {
             scale *= coef;
         }
