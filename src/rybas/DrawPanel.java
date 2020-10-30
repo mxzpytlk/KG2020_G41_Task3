@@ -3,6 +3,7 @@ package rybas;
 import rybas.linedrawers.LineDrawer;
 import rybas.linedrawers.WooLineDrawer;
 import rybas.models.Line;
+import rybas.models.SquareSpiral;
 import rybas.pixeldrawers.BufferedImagePixelDrawer;
 import rybas.pixeldrawers.PixelDrawer;
 import rybas.points.RealPoint;
@@ -16,11 +17,12 @@ import java.util.ArrayList;
 
 public class DrawPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener {
     private ArrayList<Line> lines = new ArrayList<>();
+    private ArrayList<SquareSpiral> spirals = new ArrayList<>();
     private ScreenConvertor sc = new ScreenConvertor(
             -2, 2, 4, 4, 800, 600
     );
-    private Line xAxis = new Line(-1, 0, 1, 0);
-    private Line yAxis = new Line(0, -1, 0, 1);
+/*    private Line xAxis = new Line(-1, 0, 1, 0);
+    private Line yAxis = new Line(0, -1, 0, 1);*/
 
     public DrawPanel() {
         this.addMouseMotionListener(this);
@@ -38,8 +40,11 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         sc.setScreenW(getWidth());
         bi_g.fillRect(0, 0, getWidth(), getHeight());
         bi_g.setColor(Color.black);
-        drawAxes(ld);
-        drawAll(ld);
+//        drawAxes(ld);
+//        drawAll(ld);\
+        for (SquareSpiral ss : spirals) {
+            ss.draw(ld);
+        }
         if (currentLine != null) {
             drawLine(ld, currentLine);
         }
@@ -51,18 +56,14 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         ld.drawLine(sc.r2s(l.getP1()), sc.r2s(l.getP2()));
     }
 
-    private void drawAll(LineDrawer ld) {
-        drawAxes(ld);
-    }
-
-    private void drawAxes(LineDrawer ld) {
+ /*   private void drawAxes(LineDrawer ld) {
         ld.drawLine(sc.realToScreen(xAxis.getP1()), sc.realToScreen(xAxis.getP2()));
         ld.drawLine(sc.realToScreen(yAxis.getP1()), sc.realToScreen(yAxis.getP2()));
         for (Line l : lines) {
             ld.drawLine(sc.realToScreen(l.getP1()),
                     sc.realToScreen(l.getP2()));
         }
-    }
+    }*/
 
     @Override
     public void mouseMoved(MouseEvent e) {
@@ -72,7 +73,8 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
 
     @Override
     public void mouseClicked(MouseEvent e) {
-
+        spirals.add(new SquareSpiral(new ScreenPoint(e.getX(), e.getY())));
+        repaint();
     }
 
     @Override
@@ -112,10 +114,10 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         if (e.getButton() == MouseEvent.BUTTON3) {
             prevDrag = new ScreenPoint(e.getX(), e.getY());
         } else if (e.getButton() == MouseEvent.BUTTON1) {
-            currentLine = new Line(
-                    sc.s2r(new ScreenPoint(e.getX(), e.getY())),
-                    sc.s2r(new ScreenPoint(e.getX(), e.getY()))
-            );
+//            currentLine = new Line(
+//                    sc.s2r(new ScreenPoint(e.getX(), e.getY())),
+//                    sc.s2r(new ScreenPoint(e.getX(), e.getY()))
+//            );
         }
         repaint();
     }

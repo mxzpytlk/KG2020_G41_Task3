@@ -1,5 +1,6 @@
 package rybas.models;
 
+import rybas.linedrawers.LineDrawer;
 import rybas.points.ScreenPoint;
 import java.util.ArrayList;
 
@@ -10,27 +11,27 @@ public class SquareSpiral {
     private boolean clockwiseMovement = true;
     private ArrayList<ScreenPoint> points = new ArrayList<>();
 
-    public SquareSpiral(int x, int y) {
-        this.centre = new ScreenPoint(x, y);
+    public SquareSpiral(ScreenPoint centre) {
+        this.centre = centre;
         points = findPoints();
     }
 
-    public SquareSpiral(int x, int y, int turnAmount) {
-        this.centre = new ScreenPoint(x, y);
+    public SquareSpiral(ScreenPoint centre, int turnAmount) {
+        this.centre = centre;
         this.turnAmount = turnAmount;
         this.size = 1;
         points = findPoints();
     }
 
-    public SquareSpiral(int x, int y, double size) {
-        this.centre = new ScreenPoint(x, y);
+    public SquareSpiral(ScreenPoint centre, double size) {
+        this.centre = centre;
         this.turnAmount = 10;
         this.size = size;
         points = findPoints();
     }
 
-    public SquareSpiral(int x, int y, int turnAmount, double size) {
-        this.centre = new ScreenPoint(x, y);
+    public SquareSpiral(ScreenPoint centre, int turnAmount, double size) {
+        this.centre = centre;
         this.turnAmount = turnAmount;
         this.size = size;
         points = findPoints();
@@ -67,6 +68,10 @@ public class SquareSpiral {
         clockwiseMovement = !clockwiseMovement;
     }
 
+    /**
+    * Метод ищет точки, которые находятся в месте,
+    * где соединяются линии квадратной спирали и возвращает список этих точек.
+    **/
     private ArrayList<ScreenPoint> findPoints() {
         ArrayList<ScreenPoint> points = new ArrayList<>();
 
@@ -75,9 +80,10 @@ public class SquareSpiral {
         Direction[] directions = Direction.values();
         int directionsTurnOrder = 0;
 
-        for (int i = 0; i < turnAmount; i++) {
-            prevPoint = directions[directionsTurnOrder].findNextPoint(prevPoint, lineLength);
+        for (int i = 0; i <= turnAmount; i++) {
             points.add(prevPoint);
+            prevPoint = directions[directionsTurnOrder].findNextPoint(prevPoint, lineLength);
+            //Меняет направление отрисовки линии на 90 градусов
             directionsTurnOrder = clockwiseMovement ? (directionsTurnOrder + 1) % directions.length :
                     (directionsTurnOrder + directions.length - 1) % directions.length;
             if (i % 2 == 1) {
@@ -86,6 +92,12 @@ public class SquareSpiral {
         }
 
         return points;
+    }
+
+    public void draw(LineDrawer ld) {
+        for (int i = 0; i < points.size() - 1; i++) {
+            ld.drawLine(points.get(i), points.get(i + 1));
+        }
     }
 
     private enum Direction {
