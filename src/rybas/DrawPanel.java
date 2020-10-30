@@ -2,6 +2,7 @@ package rybas;
 
 import rybas.linedrawers.DDALineDrawer;
 import rybas.linedrawers.LineDrawer;
+import rybas.linedrawers.WooLineDrawer;
 import rybas.models.Line;
 import rybas.pixeldrawers.BufferedImagePixelDrawer;
 import rybas.pixeldrawers.PixelDrawer;
@@ -33,7 +34,7 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         BufferedImage bi = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_RGB);
         Graphics2D bi_g = bi.createGraphics();
         PixelDrawer pd = new BufferedImagePixelDrawer(bi);
-        LineDrawer ld = new DDALineDrawer(pd);
+        LineDrawer ld = new WooLineDrawer(pd);
         sc.setScreenH(getHeight());
         sc.setScreenW(getWidth());
         bi_g.fillRect(0, 0, getWidth(), getHeight());
@@ -52,26 +53,6 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
     }
 
     private void drawAll(LineDrawer ld) {
-//        int w = this.getWidth()/2;
-//        int h = this.getHeight()/2;
-//
-//        Graphics2D g1 = (Graphics2D) g;
-//        g1.setStroke(new BasicStroke(2));
-//        g1.setColor(Color.black);
-//        g1.drawLine(0,h,w*2,h);
-//        g1.drawLine(w,0,w,h*2);
-//        g1.drawString("0", w - 7, h + 13);
-//
-//        int scale = 10;
-//        for (int x = 0; x <= 4; x++) {
-//            p.addPoint(w+scale*x, h - scale*((x*x*x) + x - 3));
-//        }
-////...lines skipped
-//        Polygon p1 = new Polygon();
-//        for (int x = -10; x <= 10; x++) {
-//            p1.addPoint(w + scale*x, h - scale*((x*x*x)/100) - x + 10);
-//        }
-//
         drawAxes(ld);
     }
 
