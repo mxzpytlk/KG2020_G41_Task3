@@ -1,6 +1,5 @@
 package rybas;
 
-import rybas.linedrawers.DDALineDrawer;
 import rybas.linedrawers.LineDrawer;
 import rybas.linedrawers.WooLineDrawer;
 import rybas.models.Line;
