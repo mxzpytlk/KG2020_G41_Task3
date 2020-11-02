@@ -73,19 +73,39 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         repaint();
     }
 
+    RealPoint prevMousePos = null;
     @Override
     public void mouseDragged(MouseEvent e) {
         ScreenPoint current = new ScreenPoint(e.getX(), e.getY());
 
         for (SpiralMarkers sp : spirals) {
-            if (sp.isPointInCenter(sc.s2r(current)) && sp.isShowMarkers()) {
-                changeSpiralPosition(sp, current);
+            if (sp.isShowMarkers() && sp.isPointInSpiral(sc.s2r(current))) {
+                changeSpiral(current, sp);
                 return;
             }
         }
 
         moveScreen(current);
         repaint();
+    }
+
+    private void changeSpiral(ScreenPoint current, SpiralMarkers sp) {
+        if (sp.isPointInCenter(sc.s2r(current))) {
+            changeSpiralPosition(sp, current);
+        } else {
+            changeSpiralSize(sp, current);
+        }
+    }
+
+    private void changeSpiralSize(SpiralMarkers sp, ScreenPoint current) {
+        try {
+            sp.setSize(sp.getSize() * distanceBetweenPoints(sp.getCentre(), sc.s2r(current))
+                    / distanceBetweenPoints(prevMousePos, sp.getCentre()));
+            prevMousePos = sc.s2r(current);
+            repaint();
+        } catch (SpiralParametersException e) {
+            e.printStackTrace();
+        }
     }
 
     private void changeSpiralPosition(SquareSpiral spiral, ScreenPoint newPos) {
@@ -114,22 +134,21 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         }
     }
 
-    private boolean mousePressed = false;
     @Override
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3) {
             prevDrag = new ScreenPoint(e.getX(), e.getY());
             repaint();
         } else if (e.getButton() == MouseEvent.BUTTON1) {
-            mousePressed = true;
+            prevMousePos = sc.s2r(new ScreenPoint(e.getX(), e.getY()));
         }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        mousePressed = false;
         if (e.getButton() == MouseEvent.BUTTON3) {
             prevDrag = null;
+            prevMousePos = null;
             repaint();
         }
     }
@@ -175,5 +194,10 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
             spiralParametersException.printStackTrace();
         }
         repaint();
+    }
+
+    private double distanceBetweenPoints(RealPoint p1, RealPoint p2) {
+        return Math.sqrt((p1.getX() - p2.getX()) * (p1.getX() - p2.getX()) +
+                (p1.getY() - p2.getY()) * (p1.getY() - p2.getY()));
     }
 }
