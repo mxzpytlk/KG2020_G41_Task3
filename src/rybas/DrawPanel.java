@@ -4,6 +4,7 @@ import rybas.linedrawers.LineDrawer;
 import rybas.linedrawers.WooLineDrawer;
 import rybas.models.Line;
 import rybas.models.SpiralMarkers;
+import rybas.models.SpiralParametersException;
 import rybas.models.SquareSpiral;
 import rybas.pixeldrawers.BufferedImagePixelDrawer;
 import rybas.pixeldrawers.PixelDrawer;
@@ -99,16 +100,20 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         }
     }
 
+    private boolean mousePressed = false;
     @Override
     public void mousePressed(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON3) {
             prevDrag = new ScreenPoint(e.getX(), e.getY());
             repaint();
+        } else if (e.getButton() == MouseEvent.BUTTON1) {
+            mousePressed = true;
         }
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
+        mousePressed = false;
         if (e.getButton() == MouseEvent.BUTTON3) {
             prevDrag = null;
             repaint();
@@ -127,6 +132,19 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
     @Override
     public void mouseWheelMoved(MouseWheelEvent e) {
         int clicks = e.getWheelRotation();
+
+        for (SpiralMarkers sp : spirals) {
+            if (sp.isPointInSpiral(sc.s2r(new ScreenPoint(e.getX(), e.getY()))) && sp.isShowMarkers()) {
+                try {
+                    sp.setTurnAmount(sp.getTurnAmount() - clicks);
+                } catch (SpiralParametersException spiralParametersException) {
+                    spiralParametersException.printStackTrace();
+                }
+                repaint();
+                return;
+            }
+        }
+
         double scale = 1;
         double coef = clicks > 0 ?  1.1 : 0.9;
         for (int i = 0; i < Math.abs(clicks); i++) {

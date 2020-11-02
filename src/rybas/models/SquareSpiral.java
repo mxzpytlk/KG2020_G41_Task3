@@ -22,8 +22,8 @@ public class SquareSpiral {
 
     public SquareSpiral(RealPoint centre, int turnAmount) throws SpiralParametersException {
         this.centre = centre;
-        if (turnAmount <= 0) {
-            throw new SpiralParametersException("Amounts of lines can't be less than 0");
+        if (turnAmount < 3) {
+            throw new SpiralParametersException("Amounts of lines can't be less than 3");
         }
         this.turnAmount = turnAmount;
         points = findPoints();
@@ -40,8 +40,8 @@ public class SquareSpiral {
 
     public SquareSpiral(RealPoint centre, int turnAmount, double size) throws SpiralParametersException {
         this.centre = centre;
-        if (turnAmount <= 0) {
-            throw new SpiralParametersException("Amounts of lines can't be less than 0");
+        if (turnAmount < 3) {
+            throw new SpiralParametersException("Amounts of lines can't be less than 3");
         }
         this.turnAmount = turnAmount;
         if (size <= 0) {
@@ -69,8 +69,8 @@ public class SquareSpiral {
     }
 
     public void setTurnAmount(int turnAmount) throws SpiralParametersException {
-        if (turnAmount <= 0) {
-            throw new SpiralParametersException("Amounts of lines can't be less than 0");
+        if (turnAmount < 3) {
+            throw new SpiralParametersException("Amounts of lines can't be less than 3");
         }
         this.turnAmount = turnAmount;
         points = findPoints();
