@@ -3,6 +3,7 @@ package rybas;
 import rybas.linedrawers.LineDrawer;
 import rybas.linedrawers.WooLineDrawer;
 import rybas.models.Line;
+import rybas.models.SpiralMarkers;
 import rybas.models.SquareSpiral;
 import rybas.pixeldrawers.BufferedImagePixelDrawer;
 import rybas.pixeldrawers.PixelDrawer;
@@ -16,7 +17,7 @@ import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class DrawPanel extends JPanel implements MouseMotionListener, MouseListener, MouseWheelListener {
-    private final ArrayList<SquareSpiral> spirals = new ArrayList<>();
+    private final ArrayList<SpiralMarkers> spirals = new ArrayList<>();
     private final ScreenConvertor sc = new ScreenConvertor(
             -2, 2, 4, 4, 800, 600
     );
@@ -38,8 +39,8 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         bi_g.fillRect(0, 0, getWidth(), getHeight());
         bi_g.setColor(Color.black);
 
-        for (SquareSpiral ss : spirals) {
-            ss.draw(ld, sc);
+        for (SpiralMarkers ss : spirals) {
+            ss.draw(ld, sc, bi_g);
         }
 
         bi_g.dispose();
@@ -50,8 +51,6 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         ld.drawLine(sc.r2s(l.getP1()), sc.r2s(l.getP2()));
     }
 
-
-
     @Override
     public void mouseMoved(MouseEvent e) {
     }
@@ -60,7 +59,15 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        spirals.add(new SquareSpiral(sc.s2r(new ScreenPoint(e.getX(), e.getY()))));
+        if (e.getButton() == MouseEvent.BUTTON1) {
+            spirals.add(new SpiralMarkers(sc.s2r(new ScreenPoint(e.getX(), e.getY()))));
+        } else if (e.getButton() == MouseEvent.BUTTON3) {
+            for (SpiralMarkers sm : spirals) {
+                if (sm.isPointInSpiral(sc.s2r(new ScreenPoint(e.getX(), e.getY())))) {
+                    sm.changeMarkersVisibility();
+                }
+            }
+        }
         repaint();
     }
 

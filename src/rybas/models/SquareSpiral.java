@@ -4,6 +4,8 @@ import rybas.ScreenConvertor;
 import rybas.linedrawers.LineDrawer;
 import rybas.points.RealPoint;
 import rybas.points.ScreenPoint;
+
+import java.awt.*;
 import java.util.ArrayList;
 
 public class SquareSpiral {
@@ -80,6 +82,10 @@ public class SquareSpiral {
         }
         this.size = size;
         points = findPoints();
+    }
+
+    protected ArrayList<RealPoint> getPoints() {
+        return points;
     }
 
     public void changeDirection() {
