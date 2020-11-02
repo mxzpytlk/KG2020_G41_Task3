@@ -13,23 +13,23 @@ public class SpiralMarkers extends SquareSpiral{
     private RealPoint centre;
     private boolean showMarkers = false;
 
-    public SpiralMarkers(RealPoint centre) {
-        super(centre);
+    public SpiralMarkers(RealPoint centre, double scale) {
+        super(centre, scale);
         setCorners();
     }
 
-    public SpiralMarkers(RealPoint centre, int turnAmount) throws SpiralParametersException {
-        super(centre, turnAmount);
+    public SpiralMarkers(RealPoint centre, int turnAmount, double scale) throws SpiralParametersException {
+        super(centre, turnAmount, scale);
         setCorners();
     }
 
-    public SpiralMarkers(RealPoint centre, double size) throws SpiralParametersException {
-        super(centre, size);
+    public SpiralMarkers(RealPoint centre, double scale, double size) throws SpiralParametersException {
+        super(centre, scale, size);
         setCorners();
     }
 
-    public SpiralMarkers(RealPoint centre, int turnAmount, double size) throws SpiralParametersException {
-        super(centre, turnAmount, size);
+    public SpiralMarkers(RealPoint centre, int turnAmount, double scale, double size) throws SpiralParametersException {
+        super(centre, turnAmount,scale, size);
         setCorners();
     }
 
@@ -84,6 +84,11 @@ public class SpiralMarkers extends SquareSpiral{
 
         return p.getX() > leftUp.getX() && p.getX() < rightDown.getX()
                 && p.getY() < leftUp.getY() && p.getY() > rightDown.getY();
+    }
+
+    public boolean isPointInCenter(RealPoint p) {
+        return (p.getX() - centre.getX()) * (p.getX() - centre.getX()) +
+                (p.getY() - centre.getY()) * (p.getY() - centre.getY()) < 2.5 * scale;
     }
 
     private RealPoint getRightDownCorner() {

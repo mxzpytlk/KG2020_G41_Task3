@@ -5,40 +5,43 @@ import rybas.linedrawers.LineDrawer;
 import rybas.points.RealPoint;
 import rybas.points.ScreenPoint;
 
-import java.awt.*;
 import java.util.ArrayList;
 
 public class SquareSpiral {
     private RealPoint centre;
     private int turnAmount = 10;
     private double size = 1;
+    protected final double scale;
     private boolean clockwiseMovement = true;
     private ArrayList<RealPoint> points;
 
-    public SquareSpiral(RealPoint centre) {
+    public SquareSpiral(RealPoint centre, double scale) {
         this.centre = centre;
+        this.scale = scale;
         points = findPoints();
     }
 
-    public SquareSpiral(RealPoint centre, int turnAmount) throws SpiralParametersException {
+    public SquareSpiral(RealPoint centre, int turnAmount, double scale) throws SpiralParametersException {
         this.centre = centre;
         if (turnAmount < 3) {
             throw new SpiralParametersException("Amounts of lines can't be less than 3");
         }
         this.turnAmount = turnAmount;
+        this.scale = scale;
         points = findPoints();
     }
 
-    public SquareSpiral(RealPoint centre, double size) throws SpiralParametersException {
+    public SquareSpiral(RealPoint centre, double scale, double size) throws SpiralParametersException {
         this.centre = centre;
         if (size <= 0) {
             throw new SpiralParametersException("Size can't be less than 0");
         }
+        this.scale = scale;
         this.size = size;
         points = findPoints();
     }
 
-    public SquareSpiral(RealPoint centre, int turnAmount, double size) throws SpiralParametersException {
+    public SquareSpiral(RealPoint centre, int turnAmount, double scale, double size) throws SpiralParametersException {
         this.centre = centre;
         if (turnAmount < 3) {
             throw new SpiralParametersException("Amounts of lines can't be less than 3");
@@ -47,6 +50,7 @@ public class SquareSpiral {
         if (size <= 0) {
             throw new SpiralParametersException("Size can't be less than 0");
         }
+        this.scale = scale;
         this.size = size;
         points = findPoints();
     }
@@ -99,7 +103,7 @@ public class SquareSpiral {
     private ArrayList<RealPoint> findPoints() {
         ArrayList<RealPoint> points = new ArrayList<>();
 
-        double lineLength = (0.1 * size);
+        double lineLength = (20 * scale * size);
         RealPoint prevPoint = centre;
         Direction[] directions = Direction.values();
         int directionsTurnOrder = 0;
@@ -111,7 +115,7 @@ public class SquareSpiral {
             directionsTurnOrder = clockwiseMovement ? (directionsTurnOrder + 1) % directions.length :
                     (directionsTurnOrder + directions.length - 1) % directions.length;
             if (i % 2 == 1) {
-                lineLength += 0.1 * size;
+                lineLength += 20 * scale * size;
             }
         }
 

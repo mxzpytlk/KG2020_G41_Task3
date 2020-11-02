@@ -61,7 +61,8 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
     @Override
     public void mouseClicked(MouseEvent e) {
         if (e.getButton() == MouseEvent.BUTTON1) {
-            spirals.add(new SpiralMarkers(sc.s2r(new ScreenPoint(e.getX(), e.getY()))));
+            spirals.add(new SpiralMarkers(sc.s2r(new ScreenPoint(e.getX(), e.getY())),
+                    sc.getW() / sc.getScreenW()));
         } else if (e.getButton() == MouseEvent.BUTTON3) {
             for (SpiralMarkers sm : spirals) {
                 if (sm.isPointInSpiral(sc.s2r(new ScreenPoint(e.getX(), e.getY())))) {
@@ -75,7 +76,20 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
     @Override
     public void mouseDragged(MouseEvent e) {
         ScreenPoint current = new ScreenPoint(e.getX(), e.getY());
+
+        for (SpiralMarkers sp : spirals) {
+            if (sp.isPointInCenter(sc.s2r(current)) && sp.isShowMarkers()) {
+                changeSpiralPosition(sp, current);
+                return;
+            }
+        }
+
         moveScreen(current);
+        repaint();
+    }
+
+    private void changeSpiralPosition(SquareSpiral spiral, ScreenPoint newPos) {
+        spiral.setCentre(sc.s2r(newPos));
         repaint();
     }
 
@@ -135,16 +149,15 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
 
         for (SpiralMarkers sp : spirals) {
             if (sp.isPointInSpiral(sc.s2r(new ScreenPoint(e.getX(), e.getY()))) && sp.isShowMarkers()) {
-                try {
-                    sp.setTurnAmount(sp.getTurnAmount() - clicks);
-                } catch (SpiralParametersException spiralParametersException) {
-                    spiralParametersException.printStackTrace();
-                }
-                repaint();
+                changeAmountOfLinesInSpiral(clicks, sp);
                 return;
             }
         }
 
+        changeImageSize(clicks);
+    }
+
+    private void changeImageSize(int clicks) {
         double scale = 1;
         double coef = clicks > 0 ?  1.1 : 0.9;
         for (int i = 0; i < Math.abs(clicks); i++) {
@@ -152,6 +165,15 @@ public class DrawPanel extends JPanel implements MouseMotionListener, MouseListe
         }
         sc.setW(sc.getW() * scale);
         sc.setH(sc.getH() * scale);
+        repaint();
+    }
+
+    private void changeAmountOfLinesInSpiral(int clicks, SquareSpiral sp) {
+        try {
+            sp.setTurnAmount(sp.getTurnAmount() - clicks);
+        } catch (SpiralParametersException spiralParametersException) {
+            spiralParametersException.printStackTrace();
+        }
         repaint();
     }
 }
